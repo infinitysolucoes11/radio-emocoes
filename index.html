@@ -128,7 +128,6 @@
         .chat-msg { background: var(--card-bg); padding: 6px 10px; border-radius: 6px; border-left: 3px solid var(--accent-pink); }
         .chat-msg b { color: var(--accent-blue); font-size: 0.8rem; display: block; }
 
-        /* Rodapé customizado do player para ficar elegante */
         footer {
             background: var(--card-bg); border-top: 1px solid var(--border-color); padding: 1rem 2rem;
             display: flex; justify-content: space-between; align-items: center; position: sticky; bottom: 0; z-index: 100;
@@ -143,21 +142,6 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-
-        /* Estilização avançada para encapsular e polir o widget do Caster.fm */
-        .player-container-wrapper {
-            background: var(--bg-dark);
-            border: 1px solid var(--border-color);
-            padding: 8px 16px;
-            border-radius: 30px;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        /* Mantém os links do Caster.fm exigidos pelo sistema de forma bem discreta no rodapé */
-        .cstrEmbed a { font-size: 0.65rem; color: var(--text-gray); text-decoration: none; opacity: 0.4; margin-left: 4px; }
-        .cstrEmbed a:hover { opacity: 0.8; }
 
         @media (max-width: 900px) { 
             .container { grid-template-columns: 1fr; } 
@@ -247,11 +231,11 @@
             </div>
         </div>
 
-        <!-- PLAYER INTEGRADO COM CAIXA ESTILIZADA -->
-        <div class="player-container-wrapper">
-            <div data-type="newStreamPlayer" data-publicToken="41220103-d8e6-4da3-b9ed-e61182f127ef" data-theme="dark" data-color="f43f5e" data-channelId="" data-rendered="false" class="cstrEmbed">
-                <a href="https://www.caster.fm">Shoutcast</a> 
-                <a href="https://www.caster.fm">Stream</a> 
+        <!-- PLAYER DO CASTER.FM COM LINK OBRIGATÓRIO DISCRETO -->
+        <div style="display: flex; flex-direction: column; align-items: flex-end;">
+            <div data-type="newStreamPlayer" data-publicToken="41220103-d8e6-4da3-b9ed-e61182f127ef" data-theme="dark" data-color="f43f5e" data-channelId="" data-rendered="false" class="cstrEmbed"></div>
+            <div style="font-size: 10px; margin-top: 2px; opacity: 0.5;">
+                <a href="https://www.caster.fm" target="_blank" style="color: var(--text-gray); text-decoration: none;">Streaming by Caster.fm</a>
             </div>
         </div>
     </footer>
