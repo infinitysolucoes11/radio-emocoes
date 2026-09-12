@@ -162,6 +162,51 @@
         .interacao-item { background: #f1f5f9; padding: 6px 10px; border-radius: 6px; border-left: 3px solid var(--accent-blue); }
         .interacao-item span { font-weight: bold; color: #0f172a; display: block; font-size: 0.75rem; margin-bottom: 2px; }
 
+        /* Estilos do Player de Áudio integrado */
+        .player-preview-card {
+            background: #121212;
+            color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            margin-top: 10px;
+        }
+        .live-badge {
+            background-color: #ff3b30;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: bold;
+        }
+        .play-pause-btn {
+            background-color: #4cd964;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 14px;
+            font-weight: bold;
+            border-radius: 20px;
+            cursor: pointer;
+            width: 100%;
+            margin: 10px 0;
+            transition: background 0.2s;
+        }
+        .play-pause-btn:hover { background-color: #3cb054; }
+        .volume-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-size: 13px;
+            color: #aaa;
+        }
+        .volume-container input[type="range"] {
+            width: 70%;
+            cursor: pointer;
+            accent-color: #4cd964;
+        }
+
         .toast {
             position: fixed; bottom: 20px; right: 20px; background: #10b981; color: white;
             padding: 0.8rem 1.5rem; border-radius: 8px; font-weight: bold; transform: translateY(100px);
@@ -225,11 +270,29 @@
                         </a>
                     </div>
 
-                    <!-- Streaming de Áudio Real -->
+                    <!-- Streaming de Áudio Real + Player Integrado -->
                     <div class="section-box">
                         <span class="section-title-label">🎵 Link do Streaming de Áudio (Shoutcast / Icecast)</span>
-                        <label for="audio-stream-input" style="font-size: 0.75rem; font-weight: bold; color: #475569;">URL Direta do Servidor de Áudio (.pls / .mp3):</label>
-                        <input type="text" id="audio-stream-input" class="input-config" placeholder="Ex: https://streaming.servidor.com/stream">
+                        <label for="audio-stream-input" style="font-size: 0.75rem; font-weight: bold; color: #475569;">URL Direta do Servidor de Áudio (ex: http://seu-servidor.caster.fm/gNy7u):</label>
+                        <input type="text" id="audio-stream-input" class="input-config" placeholder="Ex: http://servidor.caster.fm/gNy7u">
+
+                        <!-- Player embutido no painel para teste imediato -->
+                        <div class="player-preview-card">
+                            <span class="live-badge">🔴 AO VIVO</span>
+                            <h4 id="player-nome-radio" style="margin: 8px 0 3px 0; font-size: 15px;">Emoções FM</h4>
+                            <p style="font-size: 11px; color: #888; margin-bottom: 10px;">Ouça nossa transmissão ao vivo</p>
+                            
+                            <audio id="radioStream" preload="none">
+                                <source id="audioSource" src="" type="audio/mpeg">
+                                Seu navegador não suporta o elemento de áudio.
+                            </audio>
+
+                            <button id="playBtn" class="play-pause-btn">▶ OUVIR RÁDIO</button>
+                            <div class="volume-container">
+                                <span>🔊</span>
+                                <input type="range" id="volumeSlider" min="0" max="1" step="0.01" value="1">
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Mural de Notícias -->
@@ -288,10 +351,21 @@
 
     <script>
         window.addEventListener('DOMContentLoaded', () => {
-            document.getElementById('radio-nome').value = localStorage.getItem('radioNome') || 'Emoções FM';
-            document.getElementById('radio-slogan').value = localStorage.getItem('radioSlogan') || 'A Rádio Que Toca O Seu Coração';
+            const nomeSalvo = localStorage.getItem('radioNome') || 'Emoções FM';
+            const sloganSalvo = localStorage.getItem('radioSlogan') || 'A Rádio Que Toca O Seu Coração';
+            const streamUrlSalva = localStorage.getItem('audioStreamUrl') || '';
+
+            document.getElementById('radio-nome').value = nomeSalvo;
+            document.getElementById('radio-slogan').value = sloganSalvo;
+            document.getElementById('player-nome-radio').textContent = nomeSalvo;
+            
             document.getElementById('stream-key-input').value = localStorage.getItem('youtubeStreamKey') || '';
-            document.getElementById('audio-stream-input').value = localStorage.getItem('audioStreamUrl') || '';
+            document.getElementById('audio-stream-input').value = streamUrlSalva;
+
+            if (streamUrlSalva) {
+                document.getElementById('audioSource').src = streamUrlSalva;
+                document.getElementById('radioStream').load();
+            }
 
             const savedLogo = localStorage.getItem('radioLogo');
             if (savedLogo) mostrarLogoSalva(savedLogo);
@@ -306,6 +380,44 @@
                 carregarPedidosOperador();
                 carregarChatOperador();
             }, 3000);
+        });
+
+        // Controle do Player de Áudio
+        const audio = document.getElementById('radioStream');
+        const playBtn = document.getElementById('playBtn');
+        const volumeSlider = document.getElementById('volumeSlider');
+        const audioInput = document.getElementById('audio-stream-input');
+
+        playBtn.addEventListener('click', () => {
+            const urlAtual = audioInput.value.trim();
+            if (!urlAtual) {
+                alert('Por favor, insira o link de streaming da Caster.fm primeiro!');
+                audioInput.focus();
+                return;
+            }
+
+            // Atualiza a fonte caso tenha mudado
+            if (document.getElementById('audioSource').src !== urlAtual) {
+                document.getElementById('audioSource').src = urlAtual;
+                audio.load();
+            }
+
+            if (audio.paused) {
+                audio.play().then(() => {
+                    playBtn.textContent = '⏸ PAUSAR';
+                    playBtn.style.backgroundColor = '#ff3b30';
+                }).catch(err => {
+                    alert('Erro ao conectar ao stream. Verifique se a rádio está no ar no BUTT/Caster.fm.');
+                });
+            } else {
+                audio.pause();
+                playBtn.textContent = '▶ OUVIR RÁDIO';
+                playBtn.style.backgroundColor = '#4cd964';
+            }
+        });
+
+        volumeSlider.addEventListener('input', (e) => {
+            audio.volume = e.target.value;
         });
 
         function carregarLogo(event) {
@@ -431,10 +543,13 @@
         }
 
         document.getElementById('btn-salvar').addEventListener('click', () => {
-            localStorage.setItem('radioNome', document.getElementById('radio-nome').value);
+            const novoNome = document.getElementById('radio-nome').value;
+            localStorage.setItem('radioNome', novoNome);
             localStorage.setItem('radioSlogan', document.getElementById('radio-slogan').value);
             localStorage.setItem('youtubeStreamKey', document.getElementById('stream-key-input').value);
             localStorage.setItem('audioStreamUrl', document.getElementById('audio-stream-input').value);
+
+            document.getElementById('player-nome-radio').textContent = novoNome;
 
             const blocosNews = document.querySelectorAll('.news-item-box');
             const arrayNews = [];
