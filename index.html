@@ -132,15 +132,29 @@
             background: var(--card-bg); border-top: 1px solid var(--border-color); padding: 1rem 2rem;
             display: flex; justify-content: space-between; align-items: center; position: sticky; bottom: 0; z-index: 100;
             box-shadow: 0 -5px 20px rgba(0,0,0,0.3);
+            gap: 20px;
         }
-        .player-info { display: flex; align-items: center; gap: 12px; }
+        .player-info { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
         .player-info i { font-size: 1.8rem; color: var(--accent-pink); animation: spin-slow 8s linear infinite; }
         .player-info h4 { font-size: 1rem; color: var(--text-light); }
-        .player-info p { font-size: 0.8rem; color: var(--text-gray); }
+        .player-info p { font-size: 0.80rem; color: var(--text-gray); }
 
         @keyframes spin-slow {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
+        }
+
+        /* Removido o display flex do widget do Caster.fm para garantir que os links fiquem naturais e o script os reconheça sem erros */
+        .cstrEmbed {
+            font-size: 0.85rem;
+        }
+        .cstrEmbed a {
+            color: var(--accent-blue);
+            text-decoration: underline;
+            margin-right: 5px;
+        }
+        .cstrEmbed a:hover {
+            opacity: 0.8;
         }
 
         @media (max-width: 900px) { 
@@ -221,8 +235,10 @@
             </div>
         </div>
 
-        <!-- CÓDIGO ORIGINAL PADRÃO EXATO DO PAINEL DO CASTER.FM -->
-        <div data-type="newStreamPlayer" data-publicToken="41220103-d8e6-4da3-b9ed-e61182f127ef" data-theme="dark" data-color="f43f5e" data-channelId="" data-rendered="false" class="cstrEmbed"><a href="https://www.caster.fm">Shoutcast</a> <a href="https://www.caster.fm">Stream</a></div>
+        <!-- Bloco de links limpo e exigido pelo Caster.fm sem layout restritivo -->
+        <div data-type="newStreamPlayer" data-publicToken="41220103-d8e6-4da3-b9ed-e61182f127ef" data-theme="dark" data-color="f43f5e" data-channelId="" data-rendered="false" class="cstrEmbed">
+            <a href="https://www.caster.fm">Shoutcast</a> <a href="https://www.caster.fm">Stream</a>
+        </div>
     </footer>
 
     <!-- Script Oficial do Caster.fm -->
