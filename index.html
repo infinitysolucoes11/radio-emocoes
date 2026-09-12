@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title id="page-title">Emoções FM</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Biblioteca do Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root {
             --bg-dark: #0b0f19;
@@ -234,54 +236,82 @@
     <script src="//cdn.cloud.caster.fm//widgets/embed.js"></script>
 
     <script>
-        window.addEventListener('DOMContentLoaded', () => {
-            const nome = localStorage.getItem('radioNome');
-            if (nome) {
-                document.getElementById('header-nome').innerText = nome;
-                document.getElementById('page-title').innerText = nome;
-            }
+        // Configuração do Supabase
+        const SUPABASE_URL = "https://gyqsdyfmhzkvwxkwxnlv.supabase.co";
+        const SUPABASE_ANON_KEY = "sb_publishable_DrwmU-nMvgmJ8GsTEckqig_hgIB6v3x";
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-            const slogan = localStorage.getItem('radioSlogan');
-            if (slogan) document.getElementById('header-slogan').innerText = slogan;
-
-            const logo = localStorage.getItem('radioLogo');
-            if (logo && logo.trim() !== "") {
-                document.getElementById('header-logo-container').innerHTML = `<img src="${logo}" alt="Logo" onerror="this.onerror=null;this.parentNode.innerHTML='<i class=\'fas fa-broadcast-tower\'></i>';">`;
-            }
-
-            // Notícias
-            const noticiasSalvas = JSON.parse(localStorage.getItem('listaNoticias')) || [];
-            const containerNoticias = document.getElementById('display-noticias');
-            containerNoticias.innerHTML = '';
-            if (noticiasSalvas.length > 0) {
-                noticiasSalvas.forEach(item => {
-                    const card = document.createElement('div');
-                    card.className = 'card news-card';
-                    card.innerHTML = `<h2>${item.titulo}</h2><p>${item.texto}</p>`;
-                    containerNoticias.appendChild(card);
-                });
-            } else {
-                containerNoticias.innerHTML = `<div class="card news-card"><h2>Bem-vindo</h2><p>Fique ligado na programação.</p></div>`;
-            }
-
-            // Anúncios / Patrocinadores
-            const adsSalvos = JSON.parse(localStorage.getItem('listaAds')) || [];
-            const sidebarAds = document.getElementById('sidebar-ads');
-            sidebarAds.innerHTML = '';
-            if (adsSalvos.length > 0) {
-                adsSalvos.forEach(imgSrc => {
-                    const box = document.createElement('div');
-                    box.className = 'ad-box';
-                    box.innerHTML = `<img src="${imgSrc}" alt="Patrocinador" onerror="this.onerror=null;this.parentNode.innerHTML='<span>Espaço Patrocinador</span>';">`;
-                    sidebarAds.appendChild(box);
-                });
-            } else {
-                sidebarAds.innerHTML = `<div class="ad-box"><span>Espaço Patrocinador</span></div>`;
-            }
-
+        window.addEventListener('DOMContentLoaded', async () => {
+            await carregarDadosSupabase();
             carregarChatOuvinte();
             setInterval(carregarChatOuvinte, 3000);
         });
+
+        async function carregarDadosSupabase() {
+            const { data, error } = await supabaseClient.from('config_radio').select('*');
+            if (error) {
+                console.error("Erro ao carregar do Supabase:", error);
+                return;
+            }
+
+            if (data) {
+                data.forEach(item => {
+                    if (item.chave === 'radioNome') {
+                        document.getElementById('header-nome').innerText = item.valor;
+                        document.getElementById('page-title').innerText = item.valor;
+                    }
+                    if (item.chave === 'radioSlogan') {
+                        document.getElementById('header-slogan').innerText = item.valor;
+                    }
+                    if (item.chave === 'radioLogo' && item.valor && item.valor.trim() !== "") {
+                        document.getElementById('header-logo-container').innerHTML = `<img src="${item.valor}" alt="Logo" onerror="this.onerror=null;this.parentNode.innerHTML='<i class=\'fas fa-broadcast-tower\'></i>';">`;
+                    }
+                    if (item.chave === 'listaNoticias') {
+                        try {
+                            const noticiasSalvas = JSON.parse(item.valor) || [];
+                            const containerNoticias = document.getElementById('display-noticias');
+                            containerNoticias.innerHTML = '';
+                            if (noticiasSalvas.length > 0) {
+                                noticiasSalvas.forEach(n => {
+                                    const card = document.createElement('div');
+                                    card.className = 'card news-card';
+                                    card.innerHTML = `<h2>${n.titulo}</h2><p>${n.texto}</p>`;
+                                    containerNoticias.appendChild(card);
+                                });
+                            } else {
+                                containerNoticias.innerHTML = `<div class="card news-card"><h2>Bem-vindo</h2><p>Fique ligado na programação.</p></div>`;
+                            }
+                        } catch(e) {}
+                    }
+                    if (item.chave === 'listaAds') {
+                        try {
+                            const adsSalvos = JSON.parse(item.valor) || [];
+                            const sidebarAds = document.getElementById('sidebar-ads');
+                            sidebarAds.innerHTML = '';
+                            if (adsSalvos.length > 0) {
+                                adsSalvos.forEach(imgSrc => {
+                                    const box = document.createElement('div');
+                                    box.className = 'ad-box';
+                                    box.innerHTML = `<img src="${imgSrc}" alt="Patrocinador" onerror="this.onerror=null;this.parentNode.innerHTML='<span>Espaço Patrocinador</span>';">`;
+                                    sidebarAds.appendChild(box);
+                                });
+                            } else {
+                                sidebarAds.innerHTML = `<div class="ad-box"><span>Espaço Patrocinador</span></div>`;
+                            }
+                        } catch(e) {}
+                    }
+                });
+            }
+        }
+
+        async function salvarChaveNoSupabase(chave, valorString) {
+            const { data } = await supabaseClient.from('config_radio').select('*').eq('chave', chave);
+            if (data && data.length > 0) {
+                await supabaseClient.from('config_radio').update({ valor: valorString }).eq('chave', chave);
+            } else {
+                await supabaseClient.from('config_radio').insert([{ chave: chave, valor: valorString }]);
+            }
+        }
 
         function alternarTema() {
             const body = document.getElementById('body-root');
@@ -306,36 +336,54 @@
             document.getElementById('theme-text').innerText = 'Modo Claro';
         }
 
-        function enviarPedido() {
+        async function enviarPedido() {
             const nome = document.getElementById('input-pedido-nome').value.trim();
             const musica = document.getElementById('input-pedido-musica').value.trim();
             if (!nome || !musica) {
                 alert('Preencha seu nome e o nome da música!');
                 return;
             }
-            const pedidos = JSON.parse(localStorage.getItem('listaPedidos')) || [];
+
+            // Puxa lista atual do Supabase
+            const { data } = await supabaseClient.from('config_radio').select('*').eq('chave', 'listaPedidos');
+            let pedidos = [];
+            if (data && data.length > 0) {
+                try { pedidos = JSON.parse(data[0].valor) || []; } catch(e) {}
+            }
             pedidos.push({ nome, musica });
-            localStorage.setItem('listaPedidos', JSON.stringify(pedidos));
+            
+            await salvarChaveNoSupabase('listaPedidos', JSON.stringify(pedidos));
             document.getElementById('input-pedido-musica').value = '';
             alert('Pedido enviado com sucesso para o operador!');
         }
 
-        function enviarMensagemChat() {
+        async function enviarMensagemChat() {
             const nome = document.getElementById('input-chat-nome').value.trim();
             const texto = document.getElementById('input-chat-texto').value.trim();
             if (!nome || !texto) {
                 alert('Preencha seu apelido e a mensagem!');
                 return;
             }
-            const chat = JSON.parse(localStorage.getItem('listaChat')) || [];
+
+            const { data } = await supabaseClient.from('config_radio').select('*').eq('chave', 'listaChat');
+            let chat = [];
+            if (data && data.length > 0) {
+                try { chat = JSON.parse(data[0].valor) || []; } catch(e) {}
+            }
             chat.push({ nome, texto });
-            localStorage.setItem('listaChat', JSON.stringify(chat));
+
+            await salvarChaveNoSupabase('listaChat', JSON.stringify(chat));
             document.getElementById('input-chat-texto').value = '';
             carregarChatOuvinte();
         }
 
-        function carregarChatOuvinte() {
-            const chat = JSON.parse(localStorage.getItem('listaChat')) || [];
+        async function carregarChatOuvinte() {
+            const { data } = await supabaseClient.from('config_radio').select('*').eq('chave', 'listaChat');
+            let chat = [];
+            if (data && data.length > 0) {
+                try { chat = JSON.parse(data[0].valor) || []; } catch(e) {}
+            }
+
             const container = document.getElementById('chat-container');
             if (chat.length === 0) {
                 container.innerHTML = `<span style="color: var(--text-gray); text-align:center; font-size:0.8rem; margin-top:10px; display:block;">Seja o primeiro a enviar uma mensagem!</span>`;
