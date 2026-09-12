@@ -137,6 +137,10 @@
         .player-info h4 { font-size: 1rem; color: var(--text-light); }
         .player-info p { font-size: 0.8rem; color: var(--text-gray); }
 
+        /* Estilo para manter os links de rodapé do caster discretos mas presentes */
+        .cstrEmbed a { font-size: 0.7rem; color: var(--text-gray); text-decoration: none; margin-right: 5px; opacity: 0.6; }
+        .cstrEmbed a:hover { opacity: 1; }
+
         @media (max-width: 900px) { .container { grid-template-columns: 1fr; } }
     </style>
 </head>
@@ -181,14 +185,6 @@
 
         <div class="sidebar">
             
-            <!-- Player Integrado do Caster.fm na Lateral -->
-            <div class="card interactive-card">
-                <h3><i class="fas fa-volume-high"></i> Player Caster.fm</h3>
-                <div style="padding: 5px 0;">
-                    <div data-type="newStreamPlayer" data-publicToken="41220103-d8e6-4da3-b9ed-e61182f127ef" data-theme="light" data-color="e81e4d" data-channelId="" data-rendered="false" class="cstrEmbed"></div>
-                </div>
-            </div>
-
             <!-- Mural de Pedidos de Música -->
             <div class="card interactive-card">
                 <h3><i class="fas fa-compact-disc"></i> Pedido Musical</h3>
@@ -226,13 +222,17 @@
             <i class="fas fa-music"></i>
             <div>
                 <h4>Áudio Ao Vivo 24h</h4>
-                <p id="audio-status-text">Conectado Automaticamente ao Caster.fm</p>
+                <p id="audio-status-text">Transmitindo via Caster.fm</p>
             </div>
         </div>
-        
-        <!-- Script do Caster.fm embutido globalmente -->
-        <div style="transform: scale(0.9); transform-origin: right;">
-            <div data-type="newStreamPlayer" data-publicToken="41220103-d8e6-4da3-b9ed-e61182f127ef" data-theme="light" data-color="e81e4d" data-channelId="" data-rendered="false" class="cstrEmbed"></div>
+
+        <!-- PLAYER OFICIAL DO CASTER.FM COM OS LINKS EXIGIDOS PELO SISTEMA -->
+        <div>
+            <div data-type="newStreamPlayer" data-publicToken="41220103-d8e6-4da3-b9ed-e61182f127ef" data-theme="light" data-color="e81e4d" data-channelId="" data-rendered="false" class="cstrEmbed">
+                <a href="https://www.caster.fm">Shoutcast Hosting</a> 
+                <a href="https://www.caster.fm">Stream Hosting</a> 
+                <a href="https://www.caster.fm">Radio Server Hosting</a>
+            </div>
         </div>
     </footer>
 
