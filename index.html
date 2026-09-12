@@ -144,19 +144,6 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* Removido o display flex do widget do Caster.fm para garantir que os links fiquem naturais e o script os reconheça sem erros */
-        .cstrEmbed {
-            font-size: 0.85rem;
-        }
-        .cstrEmbed a {
-            color: var(--accent-blue);
-            text-decoration: underline;
-            margin-right: 5px;
-        }
-        .cstrEmbed a:hover {
-            opacity: 0.8;
-        }
-
         @media (max-width: 900px) { 
             .container { grid-template-columns: 1fr; } 
             footer { flex-direction: column; gap: 12px; text-align: center; }
@@ -235,10 +222,7 @@
             </div>
         </div>
 
-        <!-- Bloco de links limpo e exigido pelo Caster.fm sem layout restritivo -->
-        <div data-type="newStreamPlayer" data-publicToken="41220103-d8e6-4da3-b9ed-e61182f127ef" data-theme="dark" data-color="f43f5e" data-channelId="" data-rendered="false" class="cstrEmbed">
-            <a href="https://www.caster.fm">Shoutcast</a> <a href="https://www.caster.fm">Stream</a>
-        </div>
+        <div data-type="newStreamPlayer" data-publicToken="41220103-d8e6-4da3-b9ed-e61182f127ef" data-theme="dark" data-color="f43f5e" data-channelId="" data-rendered="false" class="cstrEmbed"></div>
     </footer>
 
     <!-- Script Oficial do Caster.fm -->
