@@ -108,7 +108,6 @@
         }
         .ad-box img { width: 100%; height: 100%; object-fit: contain; }
 
-        /* Estilos do Chat e Pedidos na Visão do Ouvinte */
         .interactive-card h3 { font-size: 1.1rem; color: var(--accent-blue); margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
         .form-group { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; }
         .form-group input, .form-group textarea {
@@ -137,8 +136,6 @@
         .player-info i { font-size: 1.8rem; color: var(--accent-pink); }
         .player-info h4 { font-size: 1rem; color: var(--text-light); }
         .player-info p { font-size: 0.8rem; color: var(--text-gray); }
-
-        audio { width: 300px; accent-color: var(--accent-pink); }
 
         @media (max-width: 900px) { .container { grid-template-columns: 1fr; } }
     </style>
@@ -184,6 +181,14 @@
 
         <div class="sidebar">
             
+            <!-- Player Integrado do Caster.fm na Lateral -->
+            <div class="card interactive-card">
+                <h3><i class="fas fa-volume-high"></i> Player Caster.fm</h3>
+                <div style="padding: 5px 0;">
+                    <div data-type="newStreamPlayer" data-publicToken="41220103-d8e6-4da3-b9ed-e61182f127ef" data-theme="light" data-color="e81e4d" data-channelId="" data-rendered="false" class="cstrEmbed"></div>
+                </div>
+            </div>
+
             <!-- Mural de Pedidos de Música -->
             <div class="card interactive-card">
                 <h3><i class="fas fa-compact-disc"></i> Pedido Musical</h3>
@@ -221,14 +226,18 @@
             <i class="fas fa-music"></i>
             <div>
                 <h4>Áudio Ao Vivo 24h</h4>
-                <p id="audio-status-text">Qualidade Digital Estéreo</p>
+                <p id="audio-status-text">Conectado Automaticamente ao Caster.fm</p>
             </div>
         </div>
-        <audio controls autoplay id="audio-player">
-            <source src="" type="audio/mpeg" id="audio-source">
-            Seu navegador não suporta streaming de áudio.
-        </audio>
+        
+        <!-- Script do Caster.fm embutido globalmente -->
+        <div style="transform: scale(0.9); transform-origin: right;">
+            <div data-type="newStreamPlayer" data-publicToken="41220103-d8e6-4da3-b9ed-e61182f127ef" data-theme="light" data-color="e81e4d" data-channelId="" data-rendered="false" class="cstrEmbed"></div>
+        </div>
     </footer>
+
+    <!-- Script Oficial do Caster.fm -->
+    <script src="//cdn.cloud.caster.fm//widgets/embed.js"></script>
 
     <script>
         window.addEventListener('DOMContentLoaded', () => {
@@ -244,29 +253,6 @@
             const logo = localStorage.getItem('radioLogo');
             if (logo) {
                 document.getElementById('header-logo-container').innerHTML = `<img src="${logo}" alt="Logo">`;
-            }
-
-            // Integrar o player do YouTube Live
-            const streamKey = localStorage.getItem('youtubeStreamKey');
-            const videoArea = document.getElementById('video-area');
-            if (streamKey) {
-                videoArea.innerHTML = `
-                    <iframe src="https://www.youtube.com/embed/live_stream?channel=${streamKey}&autoplay=1" 
-                            title="Transmissão ao vivo" 
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                            allowfullscreen>
-                    </iframe>
-                `;
-            }
-
-            // Integrar Streaming de Áudio Real
-            const audioUrl = localStorage.getItem('audioStreamUrl');
-            const audioPlayer = document.getElementById('audio-player');
-            const audioSource = document.getElementById('audio-source');
-            if (audioUrl) {
-                audioSource.src = audioUrl;
-                audioPlayer.load();
-                document.getElementById('audio-status-text').innerText = "Transmissão Online";
             }
 
             // Notícias
@@ -320,7 +306,6 @@
             }
         }
 
-        // Carrega tema salvo anteriormente
         if (localStorage.getItem('radioTema') === 'light') {
             document.getElementById('body-root').classList.add('light-theme');
             document.getElementById('theme-icon').className = 'fas fa-sun';
