@@ -264,7 +264,8 @@
                         document.getElementById('header-slogan').innerText = item.valor;
                     }
                     if (item.chave === 'radioLogo' && item.valor && item.valor.trim() !== "") {
-                        document.getElementById('header-logo-container').innerHTML = `<img src="${item.valor}" alt="Logo" onerror="this.onerror=null;this.parentNode.innerHTML='<i class=\'fas fa-broadcast-tower\'></i>';">`;
+                        const logoBox = document.getElementById('header-logo-container');
+                        logoBox.innerHTML = `<img src="${item.valor.trim()}" alt="Logo" onerror="this.onerror=null;this.parentNode.innerHTML='<i class=\'fas fa-broadcast-tower\'></i>';">`;
                     }
                     if (item.chave === 'listaNoticias') {
                         try {
@@ -292,7 +293,7 @@
                                 adsSalvos.forEach(imgSrc => {
                                     const box = document.createElement('div');
                                     box.className = 'ad-box';
-                                    box.innerHTML = `<img src="${imgSrc}" alt="Patrocinador" onerror="this.onerror=null;this.parentNode.innerHTML='<span>Espaço Patrocinador</span>';">`;
+                                    box.innerHTML = `<img src="${imgSrc.trim()}" alt="Patrocinador" onerror="this.onerror=null;this.parentNode.innerHTML='<span>Espaço Patrocinador</span>';">`;
                                     sidebarAds.appendChild(box);
                                 });
                             } else {
@@ -344,7 +345,6 @@
                 return;
             }
 
-            // Puxa lista atual do Supabase
             const { data } = await supabaseClient.from('config_radio').select('*').eq('chave', 'listaPedidos');
             let pedidos = [];
             if (data && data.length > 0) {
