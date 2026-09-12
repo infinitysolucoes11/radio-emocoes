@@ -143,6 +143,18 @@
             100% { transform: rotate(360deg); }
         }
 
+        /* Mantém os links originais exigidos pelo Caster.fm legíveis para o script, mas extremamente discretos */
+        .cstrEmbed a {
+            font-size: 9px;
+            color: var(--text-gray);
+            opacity: 0.3;
+            text-decoration: none;
+            margin-left: 5px;
+        }
+        .cstrEmbed a:hover {
+            opacity: 0.8;
+        }
+
         @media (max-width: 900px) { 
             .container { grid-template-columns: 1fr; } 
             footer { flex-direction: column; gap: 12px; text-align: center; }
@@ -231,11 +243,10 @@
             </div>
         </div>
 
-        <!-- PLAYER DO CASTER.FM COM O LINK CORRETAMENTE DENTRO DA DIV -->
-        <div>
-            <div data-type="newStreamPlayer" data-publicToken="41220103-d8e6-4da3-b9ed-e61182f127ef" data-theme="dark" data-color="f43f5e" data-channelId="" data-rendered="false" class="cstrEmbed">
-                <a href="https://www.caster.fm" target="_blank" style="font-size: 10px; color: var(--text-gray); text-decoration: none; opacity: 0.5;">Streaming by Caster.fm</a>
-            </div>
+        <!-- CÓDIGO ORIGINAL ÍNTEGRO EXIGIDO PELO CASTER.FM -->
+        <div data-type="newStreamPlayer" data-publicToken="41220103-d8e6-4da3-b9ed-e61182f127ef" data-theme="dark" data-color="f43f5e" data-channelId="" data-rendered="false" class="cstrEmbed">
+            <a href="https://www.caster.fm">Shoutcast</a> 
+            <a href="https://www.caster.fm">Stream</a>
         </div>
     </footer>
 
