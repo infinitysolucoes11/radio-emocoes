@@ -224,11 +224,11 @@
             </div>
         </div>
 
-        <div>
+        <div id="footer-player-wrapper">
             <div data-type="newStreamPlayer" data-publicToken="41220103-d8e6-4da3-b9ed-e61182f127ef" data-theme="light" data-color="e81e4d" data-channelId="" data-rendered="false" class="cstrEmbed">
                 <a href="https://www.caster.fm">Shoutcast Hosting</a> 
                 <a href="https://www.caster.fm">Stream Hosting</a> 
-                <a href="https://www.caster.fm">Radio Server Hosting</a>
+                <a href="https://www.caster.fm">Stream Hosting</a>
             </div>
         </div>
     </footer>
@@ -237,22 +237,20 @@
 
     <script>
         // Configuração do Supabase
-        const SUPABASE_URL = "https://gyqsdyfmhzkvwxkwxnlv.supabase.co";
-        const SUPABASE_ANON_KEY = "sb_publishable_DrwmU-nMvgmJ8GsTEckqig_hgIB6v3x";
+        const SUPABASE_URL = "https://gyqsdyfmhzkvwxkxnlv.supabase.co";
+        const SUPABASE_ANON_KEY = "sb_publishable_DrwmU-nMvgmJ8GsTeckqig_hgIB6ZRL";
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         window.addEventListener('DOMContentLoaded', async () => {
             await carregarDadosSupabase();
             carregarChatOuvinte();
+            setInterval(carregarDadosSupabase, 3000); // Sincroniza dados e player em tempo real
             setInterval(carregarChatOuvinte, 3000);
         });
 
         async function carregarDadosSupabase() {
             const { data, error } = await supabaseClient.from('config_radio').select('*');
-            if (error) {
-                console.error("Erro ao carregar do Supabase:", error);
-                return;
-            }
+            if (error) return;
 
             if (data) {
                 data.forEach(item => {
@@ -267,6 +265,30 @@
                         const logoBox = document.getElementById('header-logo-container');
                         logoBox.innerHTML = `<img src="${item.valor.trim()}" alt="Logo" onerror="this.onerror=null;this.parentNode.innerHTML='<i class=\'fas fa-broadcast-tower\'></i>';">`;
                     }
+                    
+                    // Estado do Vídeo YouTube (Ativo / Pausado)
+                    if (item.chave === 'estadoVideo') {
+                        const videoArea = document.getElementById('video-area');
+                        if (item.valor === 'ativo') {
+                            videoArea.innerHTML = `<iframe src="https://www.youtube.com/embed/live_stream?channel=UC_SEU_CANAL_AQUI&autoplay=1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+                        } else {
+                            videoArea.innerHTML = `<div class="video-placeholder"><i class="fas fa-video-slash"></i><p>Transmissão de vídeo pausada pelo operador.</p></div>`;
+                        }
+                    }
+
+                    // Estado do Áudio Caster.fm (Transmitindo / Pausado)
+                    if (item.chave === 'estadoAudio') {
+                        const audioStatus = document.getElementById('audio-status-text');
+                        const playerWrapper = document.getElementById('footer-player-wrapper');
+                        if (item.valor === 'pausado') {
+                            audioStatus.innerText = "Transmissão pausada pelo operador";
+                            playerWrapper.style.display = 'none';
+                        } else {
+                            audioStatus.innerText = "Transmitindo via Caster.fm";
+                            playerWrapper.style.display = 'block';
+                        }
+                    }
+
                     if (item.chave === 'listaNoticias') {
                         try {
                             const noticiasSalvas = JSON.parse(item.valor) || [];
